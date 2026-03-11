@@ -471,10 +471,12 @@ onValue(countRef, (snap) => {
   document.getElementById('count-display').textContent = (snap.val() || 0).toLocaleString();
 });
 
-function incrementCount() {
+window._incrementCount = function() {
   runTransaction(countRef, (cur) => (cur || 0) + 1);
-}
+};
+</script>
 
+<script>
 const state = { mood: '', craving: '', who: '', budget: 10000 };
 const history = [];
 
@@ -589,6 +591,11 @@ const funReasons = [
 ];
 
 function recommend() {
+  // 유효성 검사
+  if (!state.mood) { alert('Q1. 지금 기분을 선택해주세요! 😊'); return; }
+  if (!state.craving) { alert('Q2. 뭐가 땡기는지 선택해주세요! 🤤'); return; }
+  if (!state.who) { alert('Q3. 누구랑 먹는지 선택해주세요! 👥'); return; }
+
   const btn = document.getElementById('rec-btn');
   const thinking = document.getElementById('thinking');
   const result = document.getElementById('result-card');
@@ -640,7 +647,7 @@ function recommend() {
     updateHistory();
 
     // 카운터
-    incrementCount();
+    if (window._incrementCount) window._incrementCount();
 
     result.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 1400);
@@ -664,13 +671,6 @@ function copyResult() {
 function shareKakao() {
   alert('카카오 SDK 연동이 필요해요!\n(배포 후 설정 가능)');
 }
-
-// 전역으로 노출
-window.select = select;
-window.updateBudget = updateBudget;
-window.recommend = recommend;
-window.copyResult = copyResult;
-window.shareKakao = shareKakao;
 </script>
 </body>
 </html>
