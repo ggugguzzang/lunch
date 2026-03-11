@@ -459,11 +459,24 @@
 
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, runTransaction, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const app = initializeApp({ databaseURL: "https://lunch-counter-16817-default-rtdb.asia-southeast1.firebasedatabase.app" });
+const db = getDatabase(app);
+const countRef = ref(db, 'count');
+
+onValue(countRef, (snap) => {
+  document.getElementById('count-display').textContent = (snap.val() || 0).toLocaleString();
+});
+
+function incrementCount() {
+  runTransaction(countRef, (cur) => (cur || 0) + 1);
+}
+
 const state = { mood: '', craving: '', who: '', budget: 10000 };
 const history = [];
-let count = Math.floor(Math.random() * 3000) + 12847;
-document.getElementById('count-display').textContent = count.toLocaleString();
 
 function select(btn, key, val) {
   const group = btn.closest('.options');
@@ -627,8 +640,7 @@ function recommend() {
     updateHistory();
 
     // 카운터
-    count += Math.floor(Math.random() * 3) + 1;
-    document.getElementById('count-display').textContent = count.toLocaleString();
+    incrementCount();
 
     result.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 1400);
